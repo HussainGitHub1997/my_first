@@ -11,19 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $password= Hash::make('password');
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            
             $table->string('name');
-            //$table->string('email')->unique();
             $table->string('password');
-            
             $table->string('user_name')->nullable()->unique();
-            $table->unsignedBigInteger('device_id')->unique();
+            $table->string('device_id')->unique();
             $table->string('phone_number',20)->unique();
             $table->string('role',10);
-          //  $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

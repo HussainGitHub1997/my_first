@@ -23,12 +23,10 @@ class DatabaseSeeder extends Seeder
     
         $this->call([UserSeeder::class,
         SubscriptionSeeder::class,
-        
         UnitSeeder::class,
-        TermSeeder::class,
         SubjectSeeder::class,
+        SectionSeeder::class,
         RecordSeeder::class,
-
     ]);
     }
 }

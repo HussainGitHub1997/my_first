@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('records', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('subject_id')->references('id')->on('subjects');
+            $table->foreignId('section_id')->references('id')->on('sections');
             $table->string('name');
             $table->string('description');
             $table->boolean('is_subscribed')->default(false);
             $table->string('expries_at');
             $table->boolean('is_free')->default(false);
+            $table->string('url');
             $table->timestamps();
         });
     }

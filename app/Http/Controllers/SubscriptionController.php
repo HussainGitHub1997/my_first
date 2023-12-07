@@ -3,73 +3,76 @@
 namespace App\Http\Controllers;
 
 use App\Models\Subscription;
-use App\Models\User;
 use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        // $users = Subscription::all();
-        // return $users;
-
-
-       $users = Subscription::find(3);
-       return $users->User->name;
-    //    $users = User::find(1);
-    //    return $users->Subscription    ;
-
- 
+        $subscriptions = Subscription::all();
+        return response()->json(['subscriptions' => $subscriptions]);
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'user_id' => ['required', 'string'],
+            'model_type' => ['required', 'string'],
+            'model_id' => ['required', 'string'],
+            'code' => ['required', 'string'],
+            'note' => ['required', 'string'],
+            'expire_duration' => ['required', 'bool', 'size:1'],
+        ]);
+        Subscription::insert([
+            'user_id' => $request->user_id,
+            'model_type' => $request->model_type,
+            'model_id' => $request->model_id,
+            'code' => $request->code,
+            'note' => $request->note,
+            'started_at' => now(),
+            'expire_duration' => $request->expire_duration
+        ]);
+        return response()->json(["'message' => 'Subscription stored successfully'"]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Subscription $subscription)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Subscription $subscription)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Subscription $subscription)
     {
-        //
+        $request->validate([
+            'user_id' => ['required', 'string'],
+            'model_type' => ['required', 'string'],
+            'model_id' => ['required', 'string'],
+            'code' => ['required', 'string'],
+            'note' => ['required', 'string'],
+            'expire_duration' => ['required', 'bool', 'size:1'],
+        ]);
+        if ($subscription) {
+            $subscription->update($request->all());
+            return response()->json(['message' => 'Subscription updated successfully']);
+        } else {
+            return response()->json(['message' => 'not found this subscription Please check your id']);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(Subscription $subscription)
     {
-        //
+        if ($subscription) {
+            $subscription->delete();
+            return response()->json(['message' => 'Subscription destroyed successfully']);
+        } else {
+            return response()->json(['message' => 'not found this subscription Please check your id']);
+        }
+    }
+
+    public function show(Request $request)
+    {
+        $request->validate([
+            'id' => ['required', 'string'],
+        ]);
+        $subscription = Subscription::where('id', $request->id)->first();
+        if ($subscription) {
+            return response()->json(['Subscription' => $subscription]);
+        } else {
+            return response()->json(['message' => 'not found this subscription Please check your id']);
+        }
     }
 }

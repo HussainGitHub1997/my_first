@@ -1,12 +1,13 @@
 <?php
 
-use App\Http\Controllers\Api\RecordController;
-use App\Http\Controllers\Api\RegisterController;
-use App\Http\Controllers\Api\SignUpController;
-use App\Http\Controllers\Api\SubjectController;
-use App\Http\Controllers\Api\TermController;
-use App\Http\Controllers\Api\UnitController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\RecordController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\SectionController;
+use App\Http\Controllers\SignUpController;
+use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\UnitController;
+use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -14,43 +15,66 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::middleware([ 'auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
 
-    Route::post('add_term', [TermController::class, 'add']);
-    Route::post('edit_term', [TermController::class, 'edit']);
-    Route::post('delete_term', [TermController::class, 'delete']);
+    Route::group([
+        'prefix' => 'record'
+    ], function () {
+        Route::post('', [RecordController::class, 'store']);
+        Route::put('{record}', [RecordController::class, 'update']);
+        Route::delete('{record}', [RecordController::class, 'destroy']);
+    });
 
-    Route::post('add_unit', [UnitController::class, 'add']);
-    Route::post('edit_unit', [UnitController::class, 'edit']);
-    Route::post('delete_unit', [UnitController::class, 'delete']);
+    Route::group([
+        'prefix' => 'subscription'
+    ], function () {
+        Route::post('', [SubscriptionController::class, 'store']);
+        Route::put('{subscription}', [SubscriptionController::class, 'update']);
+        Route::delete('{subscription}', [SubscriptionController::class, 'destroy']);
+    });
 
-    Route::post('add_subject', [SubjectController::class, 'add']);
-    Route::post('edit_subject', [SubjectController::class, 'edit']);
-    Route::post('delete_subject', [SubjectController::class, 'delete']);
+    Route::group([
+        'prefix' => 'unit'
+    ], function () {
+        Route::post('', [UnitController::class, 'store']);
+        Route::put('{unit}', [UnitController::class, 'update']);
+        Route::delete('{unit}', [UnitController::class, 'destroy']);
+    });
 
-    Route::post('delete_record', [RecordController::class, 'delete']);
-    Route::post('add_record', [RecordController::class, 'add']);
-    Route::post('edit_record', [RecordController::class, 'edit']);
+    Route::group([
+        'prefix' => 'subject'
+    ], function () {
+        Route::post('', [SubjectController::class, 'store']);
+        Route::put('{subject}', [SubjectController::class, 'update']);
+        Route::delete('{subject}', [SubjectController::class, 'destroy']);
+    });
 
+    Route::group([
+        'prefix' => 'section'
+    ], function () {
+        Route::post('', [SectionController::class, 'store']);
+        Route::put('{section}', [SectionController::class, 'update']);
+        Route::delete('{section}', [SectionController::class, 'destroy']);
+    });
 });
 
-Route::post('/login_admin', [RegisterController::class, 'login_admin']);
-Route::post('/login_custmer', [RegisterController::class, 'login_custmer']);
-Route::post('/sign_up', [SignUpController::class, 'sign_up']);
 
-Route::get('show_term', [TermController::class, 'show']);
-Route::get('index_term', [TermController::class, 'index']);
+Route::post('/login/admin', [UserController::class, 'loginAdmin']);
+Route::post('/login/custmer', [UserController::class, 'loginCustmer']);
+Route::post('/signup', [SignUpController::class, 'signup']);
 
-Route::get('show_record', [RecordController::class, 'show']);
-Route::get('index_record', [RecordController::class, 'index']);
+Route::get('show/section', [SectionController::class, 'show']);
+Route::get('index/section', [SectionController::class, 'index']);
 
-Route::get('show_subject', [SubjectController::class, 'show']);
-Route::get('index_subject', [SubjectController::class, 'index']);
+Route::get('show/record', [RecordController::class, 'show']);
+Route::get('index/record', [RecordController::class, 'index']);
 
-Route::get('show_unit', [UnitController::class, 'show']);
-Route::get('index_unit', [UnitController::class, 'index']);
+Route::get('show/subscription', [SubscriptionController::class, 'show']);
+Route::get('index/subscription', [SubscriptionController::class, 'index']);
 
 
+Route::get('show/subject', [SubjectController::class, 'show']);
+Route::get('index/subject', [SubjectController::class, 'index']);
 
-
-
+Route::get('show/{show}', [UnitController::class, 'show']);
+Route::get('index/unit', [UnitController::class, 'index']);

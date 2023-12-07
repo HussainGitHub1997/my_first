@@ -19,14 +19,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',   
-        'password',
-        'user_name',
-        'device_id',
-        'phone_number',
-    ];
-
+    protected $fillable = ['name','password','user_name','device_id','phone_number'];
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -50,4 +43,5 @@ class User extends Authenticatable
     {
         return $this->hasMany(Subscription::class);
     }
+    
 }

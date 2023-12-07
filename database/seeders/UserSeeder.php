@@ -1,11 +1,10 @@
 <?php
 
 namespace Database\Seeders;
-
-use DB;
-use Hash;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
@@ -17,10 +16,10 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
         'name' =>'hussain' ,
         'password' => Hash::make('password'),
+        'user_name'=> 'adoAli',
         'phone_number' => '0956978759',
         'device_id' => 1,
         'role' => 'admin',
-        'user_name' => 'hussain',
         ]);
         DB::table('users')->insert([
             'name' =>'admad' ,

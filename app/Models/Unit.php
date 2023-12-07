@@ -17,9 +17,9 @@ class Unit extends Model
     {
         return $this->hasOne(Subscription::class);
     }
-    public function term()
+    public function subject()
     {
-        return $this->hasMany(Term::class);
+        return $this->hasMany(Subject::class);
     }
    
 }

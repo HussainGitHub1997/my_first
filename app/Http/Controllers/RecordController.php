@@ -2,70 +2,82 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\Record;
-use App\Models\Subject;
 use Illuminate\Http\Request;
 
 class RecordController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $users = Record::all();
-        return $users;
-        //  $user=Subject::find(5);
-        //  return $user;
-        //  $user=Subject::find(1);
-        //  return $user->Record;
+        $records = Record::all();
+        foreach ($records as $record) {
+            if ($record->is_free || $record->is_subscribed) {
+                echo json_encode($record) . "\n";
+            }
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-  
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'section_id' => ['required', 'string'],
+            'name' => ['required', 'string'],
+            'description' => ['required', 'string'],
+            'is_subscribed' => ['required', 'bool'],
+            'is_free' => ['required', 'bool'],
+            'url' => ['required', 'string'],
+        ]);
+        Record::insert([
+            'section_id' => $request->section_id,
+            'name' => $request->name,
+            'description' => $request->description,
+            'is_subscribed' => $request->is_subscribed,
+            'expries_at' => now(),
+            'url' => $request->url,
+            'is_free' => $request->is_free
+        ]);
+        return response()->json(["name" => $request->name, "insert sucssesfuly"]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Record $record)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Record $record)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Record $record)
     {
-        //
+        $request->validate([
+            'section_id' => ['required', 'string'],
+            'name' => ['required', 'string'],
+            'description' => ['required', 'string'],
+            'is_subscribed' => ['required', 'bool', 'size:1'],
+            'is_free' => ['required', 'bool', 'size:1'],
+        ]);
+        if ($record) {
+            $record->update($request->all());
+            return response()->json(['message' => 'record updated successfully']);
+        } else {
+            return response()->json(['message' => 'not found this record Please check your id']);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Record $record)
     {
-        //
+        if ($record) {
+            $record->delete();
+            return response()->json(['message' => 'record destroy successfully']);
+        } else {
+            return response()->json(['message' => 'not found this record Please check your id']);
+        }
+    }
+    public function show(Request $request)
+    {
+        $request->validate(['id' => ['required', 'string'],]);
+        $record = Record::where('id', $request->id)->first();
+        if ($record) {
+            if ($record->is_free || $record->is_subscribed) {
+                return response()->json(['record' => $record]);
+            } else {
+                return response()->json(['message' => 'You do not have any subscriptions']);
+            }
+        } else {
+            return response()->json(['message' => 'not found this record Please check your id']);
+        }
     }
 }

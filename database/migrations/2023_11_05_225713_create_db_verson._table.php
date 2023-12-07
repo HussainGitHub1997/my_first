@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('db_verson', function (Blueprint $table) {
             $table->id();
-            
         });
     }
 

@@ -2,74 +2,61 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Record;
+use App\Http\Controllers\Controller;
 use App\Models\Subject;
-use App\Models\Subscription;
-use App\Models\Term;
 use Illuminate\Http\Request;
 
 class SubjectController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
- $users = Subject::all();
-        return $users;
-// $users = Term::find(3);
-// return $users->Subject;
-
-
-
-
-         }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        $subjects = Subject::all();
+        return response()->json(['subjects' => $subjects]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'unit_id' => ['required', 'string'],
+            'name' => ['required', 'string'],
+            'description' => ['required', 'string'],
+        ]);
+        Subject::insert($request->all());
+        return response()->json(["name" => $request->name, "insert sucssesfuly"]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Subject $subject)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Subject $subject)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Subject $subject)
     {
-        //
+        $request->validate([
+            'unit_id' => ['required', 'string'],
+            'name' => ['required', 'string'],
+            'description' => ['required', 'string'],
+        ]);
+        if ($subject) {
+            $subject->update($request->all());
+            return response()->json(['message' => 'subject updated successfully']);
+        } else {
+            return response()->json(['message' => 'not found this subject Please check your id']);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Subject $subject)
     {
-        //
+        if ($subject) {
+            $subject->delete();
+            return response()->json(["subject destroy sucssesfuly"]);
+        } else {
+            return response()->json(['message' => 'not found this subject Please check your id']);
+        }
+    }
+    public function show(Request $request)
+    {
+        $request->validate(['id' => ['required', 'string'],]);
+        $subject = Subject::where('id', $request->id)->first();
+        if ($subject) {
+            return response()->json(['subjects' => $subject]);
+        } else {
+            return response()->json(['message' => 'not found this subject Please check your id']);
+        }
     }
 }

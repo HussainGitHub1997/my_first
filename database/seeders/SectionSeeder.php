@@ -1,20 +1,19 @@
 <?php
 
 namespace Database\Seeders;
-
-use DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
-class TermSeeder extends Seeder
+class SectionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        DB::table('terms')->insert([
-            'unit_id' =>1 ,
+        DB::table('sections')->insert([
+            'subject_id' =>1 ,
             'description' => 'sdd',
             'name' => 'nnnn',
            

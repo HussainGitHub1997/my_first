@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class RecordSeeder extends Seeder
 {
@@ -14,12 +14,13 @@ class RecordSeeder extends Seeder
     public function run(): void
     {
         DB::table('records')->insert([
-            'name' =>'ggtt' ,
-            'subject_id' => 1,
+            'name' =>'record1' ,
+            'section_id' => 1,
             'description' => 'dszf',
             'is_subscribed' => true,
-            'expries_at' => 'today',
+            'expries_at' => now(),
             'is_free'=> true,
+            'url'=>'www.hussain.com'
             ]);
     }
 }

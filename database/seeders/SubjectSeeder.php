@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class SubjectSeeder extends Seeder
 {
@@ -15,7 +15,7 @@ class SubjectSeeder extends Seeder
     {
         DB::table('subjects')->insert([
             'name' =>'nonome' ,
-            'term_id' => 1,
+            'unit_id' => 1,
             'description' => 'no,des',
             
             ]);

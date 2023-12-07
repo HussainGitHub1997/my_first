@@ -10,14 +10,18 @@ use Illuminate\Database\Eloquent\Model;
 class Subject extends Model
 {
     use HasFactory;
-    protected $fillable = ['term_id','name','description'];
+    protected $fillable = ['unit_id','name','description'];
 
-    public function term()
+    public function unit()
     {
-        return $this->hasOne(Term::class);
+        return $this->belongsTo(Unit::class);
     }
-    public function record()
+    public function section()
     {
-        return $this->hasMany(Record::class);
+        return $this->hasMany(Section::class);
+    }
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class);
     }
 }
