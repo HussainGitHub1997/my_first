@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\RecordController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\OpensslController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SignUpController;
 use App\Http\Controllers\SubjectController;
@@ -76,5 +77,13 @@ Route::get('index/subscription', [SubscriptionController::class, 'index']);
 Route::get('show/subject', [SubjectController::class, 'show']);
 Route::get('index/subject', [SubjectController::class, 'index']);
 
-Route::get('show/{show}', [UnitController::class, 'show']);
+Route::get('show/unit', [UnitController::class, 'show']);
 Route::get('index/unit', [UnitController::class, 'index']);
+
+
+Route::controller(OpensslController::class)->group(function () {
+    Route::post('upload', 'upload');
+    Route::get ('encryption/{file_name}', 'encryption');
+    Route::get('decription/{file_name}', 'decription');
+    Route::get('show', 'show');
+});
