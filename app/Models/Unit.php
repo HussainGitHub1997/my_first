@@ -12,7 +12,10 @@ use Illuminate\Database\Eloquent\Model;
 class Unit extends Model
 {
     use HasFactory;
-    protected $fillable = ['name','description'];    
+    protected $fillable = ['name', 
+    'description'
+    ];     
+    
     public function subscription()
     {
         return $this->hasOne(Subscription::class);

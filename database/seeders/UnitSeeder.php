@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Unit;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +14,7 @@ class UnitSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('units')->insert([
+        Unit::insert([
             'name' =>'name' ,
             'description' => 'no',
             

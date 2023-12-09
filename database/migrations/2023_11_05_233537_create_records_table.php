@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
             $table->boolean('is_subscribed')->default(false);
-            $table->string('expries_at');
+            $table->timestamp('expired_at')->nullable();
             $table->boolean('is_free')->default(false);
-            $table->string('url');
+            $table->string('path');
             $table->timestamps();
         });
     }

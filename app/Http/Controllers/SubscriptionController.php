@@ -4,75 +4,99 @@ namespace App\Http\Controllers;
 
 use App\Models\Subscription;
 use Illuminate\Http\Request;
+use App\Http\Resources\SubscriptionCollection;
+use App\Models\User;
 
 class SubscriptionController extends Controller
 {
     public function index()
     {
-        $subscriptions = Subscription::all();
-        return response()->json(['subscriptions' => $subscriptions]);
-    }
-    public function store(Request $request)
-    {
-        $request->validate([
-            'user_id' => ['required', 'string'],
-            'model_type' => ['required', 'string'],
-            'model_id' => ['required', 'string'],
-            'code' => ['required', 'string'],
-            'note' => ['required', 'string'],
-            'expire_duration' => ['required', 'bool', 'size:1'],
-        ]);
-        Subscription::insert([
-            'user_id' => $request->user_id,
-            'model_type' => $request->model_type,
-            'model_id' => $request->model_id,
-            'code' => $request->code,
-            'note' => $request->note,
-            'started_at' => now(),
-            'expire_duration' => $request->expire_duration
-        ]);
-        return response()->json(["'message' => 'Subscription stored successfully'"]);
+        return new SubscriptionCollection(Subscription::all());
     }
 
-    public function update(Request $request, Subscription $subscription)
+    public function show(Subscription $subscription)
     {
-        $request->validate([
-            'user_id' => ['required', 'string'],
-            'model_type' => ['required', 'string'],
-            'model_id' => ['required', 'string'],
-            'code' => ['required', 'string'],
-            'note' => ['required', 'string'],
-            'expire_duration' => ['required', 'bool', 'size:1'],
-        ]);
-        if ($subscription) {
-            $subscription->update($request->all());
-            return response()->json(['message' => 'Subscription updated successfully']);
+        Subscription::findOrFail($subscription->id);
+        return response()->json(['Subscription' => $subscription]);
+    }
+    public function store(Request $request, User $user)
+    {
+        if ($user->role == 'admin') {
+
+            $request->validate([
+                'user_id' => ['required', 'string', 'nullable'],
+                'model_type' => ['required', 'string', 'nullable'],
+                'model_id' => ['required', 'string', 'nullable'],
+                'code' => ['required', 'string', 'nullable', 'size:8'],
+                'note' => ['required', 'string', 'nullable'],
+                'expire_duration' => ['required', 'integer', 'nullable'],
+            ]);
+
+            Subscription::insert($request->all());
+
+            return response()->json([
+                'message' => 'Subscription stored successfully',
+                "Subscription" => [
+                    'user_id' => $request->user_id,
+                    'model_type' => $request->model_type,
+                    'model_id' => $request->model_id,
+                    'code' => $request->code,
+                    'note' => $request->note,
+                    'expire_duration' => $request->expire_duration
+                ]
+            ]);
         } else {
-            return response()->json(['message' => 'not found this subscription Please check your id']);
+            header("HTTP/1.1 401 Unauthorized");
+            include("error401.php");
+            exit;
+        }
+    }
+    public function update(Request $request, User $user, Subscription $subscription)
+    {
+        if ($user->role == 'admin') {
+            $request->validate([
+                'user_id' => ['required', 'string', 'nullable'],
+                'model_type' => ['required', 'string', 'nullable'],
+                'model_id' => ['required', 'string', 'nullable'],
+                'code' => ['required', 'string', 'nullable', 'size:8'],
+                'note' => ['required', 'string', 'nullable'],
+                'expire_duration' => ['required', 'integer', 'nullable'],
+            ]);
+
+
+            Subscription::findOrFail($subscription->id); 
+
+                $subscription->update($request->all());
+                return response()->json([
+                    'message' => 'Subscription updated successfully',
+                    "Subscription" => [
+                        'user_id' => $request->user_id,
+                        'model_type' => $request->model_type,
+                        'model_id' => $request->model_id,
+                        'code' => $request->code,
+                        'note' => $request->note,
+                        'expire_duration' => $request->expire_duration
+                    ]
+                ]);
+            
+        } else {
+            header("HTTP/1.1 401 Unauthorized");
+            include("error401.php");
+            exit;
         }
     }
 
 
-    public function destroy(Subscription $subscription)
+    public function destroy(user $user, Subscription $subscription)
     {
-        if ($subscription) {
+        if ($user->role == 'admin') {
+            Subscription::findOrFail($subscription->id);
             $subscription->delete();
             return response()->json(['message' => 'Subscription destroyed successfully']);
         } else {
-            return response()->json(['message' => 'not found this subscription Please check your id']);
-        }
-    }
-
-    public function show(Request $request)
-    {
-        $request->validate([
-            'id' => ['required', 'string'],
-        ]);
-        $subscription = Subscription::where('id', $request->id)->first();
-        if ($subscription) {
-            return response()->json(['Subscription' => $subscription]);
-        } else {
-            return response()->json(['message' => 'not found this subscription Please check your id']);
+            header("HTTP/1.1 401 Unauthorized");
+            include("error401.php");
+            exit;
         }
     }
 }

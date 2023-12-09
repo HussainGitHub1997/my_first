@@ -10,7 +10,10 @@ use Illuminate\Database\Eloquent\Model;
 class Section extends Model
 {
     use HasFactory;
-    protected $fillable = ['subject_id','name','description'] ;
+    protected $fillable = ['subject_id',
+    'name',
+    'description' 
+    ];
 
     public function subjects()
     {

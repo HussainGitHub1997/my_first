@@ -10,7 +10,10 @@ use Illuminate\Database\Eloquent\Model;
 class Subject extends Model
 {
     use HasFactory;
-    protected $fillable = ['unit_id','name','description'];
+    protected $fillable = ['unit_id',
+    'name',
+    'description'
+    ];
 
     public function unit()
     {

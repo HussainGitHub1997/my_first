@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Subscription;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use App\Http\Resources\UserCollection;
+
 
 class UserController extends Controller
 {
@@ -14,11 +16,12 @@ class UserController extends Controller
     {
         $request->validate([
             'device_id' => ['required', 'string'],
-            'phone_number' => ['required', 'string'],
-            'password' => ['required', 'string'],
+            'phone_number' => ['required', 'string','alpha_num:ascii'],
+            'password' => ['required', 'string','alpha_dash:ascii'],
         ]);
         $user = User::where('phone_number', $request->phone_number)->first();
-        if (Hash::check($request->password, $user->password) && $user->role == 'admin') {
+        if (Hash::check($request->password, $user->password) && $user->role == 'admin')
+         {
             $token = $user->createToken('admin_token');
             return response()->json([
                 'id' => $user->id,
@@ -30,30 +33,63 @@ class UserController extends Controller
     public function loginCustmer(Request $request)
     {
         $request->validate([
-            'code' => ['required', 'string'],
+            'code' => ['required', 'string','size:8'],
         ]);
+        
         $subscription = Subscription::where('code', $request->code)->first();
-        $custmer = User::all()->where('id', $subscription->user_id)->first();
-        $token = $custmer->createToken('custmer_token');
+        $client = User::where('id', $subscription->user_id)->first();
+        $subscription->update(['started_at'=>now()]);
+        $token = $client->createToken('client_token');
         return response()->json([
-            'id' => $custmer->id,
-            'name' => $custmer->name,
+            'id' => $client->id,
+            'name' => $client->name,
             'token' => $token->plainTextToken
         ]);
     }
-    public function index()
+
+    public function signup(Request $request)
     {
-        $users = User::all();
-        return response()->json(['users' => $users]);
+
+        $request->validate([
+            'name' => ['required', 'string','alpha_dash:ascii'],
+            'device_id' => ['required', 'string'],
+            'phone_number' => ['required', 'string','alpha_num:ascii'],
+            'password' => ['required', 'string','current_password:api'],
+        ]);
+
+        User::insert([
+            'name' => $request->name,
+            'phone_number' => $request->phone_number,
+            'device_id' => $request->device_id,
+            'role' => 'client',
+            'password' => Hash::make($request->password),
+        ]);
+
+        return response()->json([
+            'welcome ' => $request->name
+        ]);
     }
 
-    public function show(Request $request)
+    public function generateCode(){
+        $rand_start = rand(1,5);
+        $uniqid = uniqid();
+        $code = substr($uniqid,$rand_start,8);
+        while($code==Subscription::find($code)){
+            $rand_start = rand(1,5);
+            $uniqid = uniqid();
+            $code = substr($uniqid,$rand_start,8);
+        }
+        return $code;
+    }
+
+    public function index()
     {
-        $request->validate([
-            'id' => ['required', 'string'],
-        ]);
-        $users = User::where('id', $request->id);
-        return response()->json(['user' => $users]);
+        return new UserCollection(User::all());
+    }
+
+    public function show(User $user)
+    {
+        return response()->json(['user' => $user]);
     }
 
     public function update(Request $request, string $id)

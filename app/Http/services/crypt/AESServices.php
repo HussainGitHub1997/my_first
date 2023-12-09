@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\services\crypt;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class OpensslController extends Controller
+class AESServices
 {
     public function upload(Request $request)
     {
@@ -14,11 +14,14 @@ class OpensslController extends Controller
         Storage::disk('local')->put($path, file_get_contents($request->file));
         return response()->json(['message' => 'File uploaded successfully', 'file_path' => $path]);
     }
-    public function show()
+
+    public function show($file_name)
     {
-    //  $file=Storage::get('public/uploads/jlrK72Dss9cG2wlxu0GaNhTwNTmuzDltFYYJxnz7');
-        $size = Storage::size("public/uploads/file");
-        return response()->json(['message' => 'File uploaded successfully', 'file_size' => "$size  bytes"]);
+        //  $file=Storage::get('public/uploads/jlrK72Dss9cG2wlxu0GaNhTwNTmuzDltFYYJxnz7');
+        $filePath = "public/uploads/" . $file_name;
+        $data = Storage::get($filePath);
+        $size = Storage::size($filePath);
+        return response()->json(['File name' => "$file_name", 'file_size' => "$size  bytes"]);
     }
 
 
@@ -43,8 +46,8 @@ class OpensslController extends Controller
             Storage::put("public/uploads/saved/$file_name", $string_data);
             echo asset('storage/public/uploads/saved' . "file name: $file_name");
             //Print_r($myArray);
-
-        } else {
+        }
+        else {
             return response()->json(['error' => 'File not found']);
         }
     }
