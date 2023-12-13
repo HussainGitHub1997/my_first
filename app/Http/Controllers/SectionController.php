@@ -3,86 +3,89 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\SectionResource;
 use App\Models\Section;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
-use App\Http\Resources\SectoinCollection;
-use App\Models\User;
 
 class SectionController extends Controller
 {
     public function index()
     {
-        return new SectoinCollection(Section::all());
+        $sections = Section::all();
+        return response()->json([
+            'message'   => "These are the sections",
+            'data'  => [
+                'Sections' => SectionResource::collection($sections),
+            ]
+        ]);
     }
 
     public function show(Section $section)
     {
-        Section::findOrFail($section->id);
-            return response()->json(['section' => $section]);
+        return response()->json(['section' => $section]);
     }
 
-    public function store( User $user,Request $request)
+    public function store(Request $request)
     {
-        if ($user->role == 'admin') {
-            $request->validate([
-                'subject_id' => ['required', 'string','nullable'],
-                'name' => ['required','alpha_dash:ascii' , 'string','nullable'],
-                'description' => ['required', 'string','nullable'],
+        $request->validate([
+            'subject_id' => ['required', 'string'],
+            'name' => ['string', 'present'],
+            'description' => ['required', 'string'],
+        ]);
+
+        $user = $request->user();
+
+        if ($user->role != 'admin') {
+            return new AuthenticationException;
+        } else {
+            $section = Section::create([
+                'subject_id'    => $request->subject_id,
+                'name'          => $request->name,
+                'description'   => $request->description,
             ]);
-
-            Section::insert($request->all());
-
             return response()->json([
                 "message" => "section insert sucssesfuly",
+                "data" => [
+                    "section" => SectionResource::make($section),
+                ]
+            ]);
+        }
+    }
+
+    public function update(Section $section, Request $request)
+    {
+        $request->validate([
+            'subject_id' => ['required', 'string'],
+            'name' => ['string', 'present'],
+            'description' => ['required', 'string'],
+        ]);
+
+        $user = $request->user();
+
+        if ($user->role != 'admin') {
+            return new AuthenticationException();
+        } else {
+            $section->update($request->all());
+            return response()->json([
+                'message' => 'section updated successfully',
                 "section" => [
                     "name" => $request->name,
                     'subject_id' => $request->subject_id,
                     'description' => $request->description,
-                ]
+                ],
             ]);
-        } else {
-            header("HTTP/1.1 401 Unauthorized");
-            include("error401.php");
-            exit;
         }
     }
 
-    public function update(User $user, Section $section, Request $request)
-    {  
-        if ($user->role == 'admin') {
-        $request->validate([
-            'subject_id' => ['required', 'string','nullable'],
-                'name' => ['required','alpha_dash:ascii' , 'string','nullable'],
-                'description' => ['required', 'string','nullable'],
-        ]);
-
-        Section::findOrFail($section->id);
-        
-            $section->update($request->all());
-            return response()->json(['message' => 'section updated successfully',
-            "section" => [
-                "name" => $request->name,
-                'subject_id' => $request->subject_id,
-                'description' => $request->description,
-            ],
-        ]);
-        } else {
-            header("HTTP/1.1 401 Unauthorized");
-            include("error401.php");
-            exit;
-        }
-    }
-
-    public function destroy(User $user, Section $section)
+    public function destroy(Request $request, Section $section)
     {
-        if ($user->role == 'admin') {
-            Section::findOrFail($section->id);
-            $section->delete();
-            return response()->json(["section destroy sucssesfuly"]);
+        $user = $request->user();
+        if ($user->role != 'admin') {
+            return new AuthenticationException();
         } else {
-            header("HTTP/1.1 401 Unauthorized");
-            include("error401.php");
-            exit;
+            $section->delete();
+            return response()->json(['message' => 'record destroy successfully']);
         }
     }
 }

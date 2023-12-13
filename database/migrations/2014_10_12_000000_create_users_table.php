@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('device_id')->unique();
             $table->string('phone_number',20)->unique();
-            $table->string('role',10);
+            $table->string('role',10)->default('client');
             $table->rememberToken();
             $table->timestamps();
         });

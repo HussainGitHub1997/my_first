@@ -27,7 +27,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('password'),
             'phone_number' => '0991965818',
             'device_id' => 2,
-            'role' => 'custmer',
+            'role' => 'client',
             ]);
     }
 }

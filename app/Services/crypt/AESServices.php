@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\services\crypt;
+namespace App\services\crypt;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;

@@ -4,58 +4,68 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Subject;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
-use App\Http\Resources\SubjectCollection;
-use App\Models\User;
+use App\Http\Resources\SubjectResource;
 
 class SubjectController extends Controller
 {
     public function index()
     {
-        return new SubjectCollection(Subject::all());
+        $subjects = Subject::all();
+        return response()->json([
+            'message'   => "These are the subjects",
+            'data'  => [
+                'Subjects' => SubjectResource::collection($subjects),
+            ]
+        ]);
     }
+
 
     public function show(Subject $subject)
     {
-        Subject::findOrFail($subject->id);
         return response()->json(['subjects' => $subject]);
     }
 
-    public function store(Request $request, User $user)
+    public function store(Request $request)
     {
-        if ($user->role == 'admin') {
-            $request->validate([
-                'unit_id' => ['required', 'string', 'nullable'],
-                'name' => ['required', 'alpha_dash:ascii', 'string', 'nullable'],
-                'description' => ['required', 'string', 'nullable'],
-            ]);
+        $request->validate([
+            'unit_id' => ['required', 'string'],
+            'name' =>['string', 'present'],
+            'description' => ['required', 'string'],
+        ]);
 
-            Subject::insert($request->all());
+        $user = $request->user();
+
+        if ($user->role != 'admin') {
+            return new AuthenticationException();
+        } else {
+            $subject = Subject::create([
+                'unit_id' => $request->unit_id,
+                'name' => $request->name,
+                'description' => $request->description,
+            ]);
 
             return response()->json([
                 "message" => "subject insert sucssesfuly",
-                "subject" => [
-                    "name" => $request->name,
-                    'unit_id' => $request->unit_id,
-                    'description' => $request->description,
+                "data" => [
+                    "subject" => SubjectResource::make($subject),
                 ]
             ]);
-        } else {
-            header("HTTP/1.1 401 Unauthorized");
-            include("error401.php");
-            exit;
         }
     }
-    public function update(Request $request, User $user, Subject $subject)
+    public function update(Request $request, Subject $subject)
     {
-        if ($user->role == "admin") {
-            $request->validate([
-                'unit_id' => ['required', 'string', 'nullable'],
-                'name' => ['required', 'alpha_dash:ascii', 'string', 'nullable'],
-                'description' => ['required', 'string', 'nullable'],
-            ]);
+        $request->validate([
+            'unit_id' => ['required', 'string'],
+            'name' =>['string', 'present'],
+            'description' => ['required', 'string'],
+        ]);
 
-            Subject::findOrFail($subject->id);
+        $user = $request->user();
+        if ($user->role != "admin") {
+            return new AuthenticationException();
+        } else {
             $subject->update($request->all());
             return response()->json([
                 'message' => 'subject updated successfully',
@@ -65,23 +75,17 @@ class SubjectController extends Controller
                     'description' => $request->description,
                 ],
             ]);
-        } else {
-            header("HTTP/1.1 401 Unauthorized");
-            include("error401.php");
-            exit;
         }
     }
 
-    public function destroy(User $user, Subject $subject)
+    public function destroy(Request $request, Subject $subject)
     {
-        if ($user->role == 'admin') {
-            Subject::findOrFail($subject->id);
-            $subject->delete();
-            return response()->json(["subject destroy sucssesfuly"]);
+        $user = $request->user();
+        if ($user->role != 'admin') {
+            return new AuthenticationException();
         } else {
-            header("HTTP/1.1 401 Unauthorized");
-            include("error401.php");
-            exit;
+            $subject->delete();
+            return response()->json(["message"=>"subject destroy sucssesfuly"]);
         }
     }
 }
