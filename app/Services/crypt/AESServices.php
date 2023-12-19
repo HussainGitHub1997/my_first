@@ -2,6 +2,7 @@
 
 namespace App\services\crypt;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -9,15 +10,22 @@ class AESServices
 {
     public function upload(Request $request)
     {
-        $originalName = $request->file->getClientOriginalName();
-        $path = "public/uploads/" . $originalName;
-        Storage::disk('local')->put($path, file_get_contents($request->file));
-        return response()->json(['message' => 'File uploaded successfully', 'file_path' => $path]);
+        $request->validate([
+            'file' => ['file', 'present'],
+        ]);
+        $user = $request->user();
+        if ($user->role == 'admin') {
+            $originalName = $request->file->getClientOriginalName();
+            $path = "public/uploads/" . $originalName;
+            Storage::disk('local')->put($path, file_get_contents($request->file));
+            return response()->json(['message' => 'File uploaded successfully', 'file_path' => $path]);
+        } else {
+            return new AuthenticationException();
+        }
     }
 
     public function show($file_name)
     {
-        //  $file=Storage::get('public/uploads/jlrK72Dss9cG2wlxu0GaNhTwNTmuzDltFYYJxnz7');
         $filePath = "public/uploads/" . $file_name;
         $data = Storage::get($filePath);
         $size = Storage::size($filePath);
@@ -46,8 +54,7 @@ class AESServices
             Storage::put("public/uploads/saved/$file_name", $string_data);
             echo asset('storage/public/uploads/saved' . "file name: $file_name");
             //Print_r($myArray);
-        }
-        else {
+        } else {
             return response()->json(['error' => 'File not found']);
         }
     }

@@ -2,8 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Record;
-use App\Models\Term;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,8 +22,8 @@ class Subject extends Model
     {
         return $this->hasMany(Section::class);
     }
-    public function subscription()
+    public function subscription(): MorphOne
     {
-        return $this->hasOne(Subscription::class);
+        return $this->morphOne(Subscription::class, 'model');
     }
 }

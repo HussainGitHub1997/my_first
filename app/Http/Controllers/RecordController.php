@@ -7,6 +7,9 @@ use App\Models\Record;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use App\Http\Resources\RecordResource;
+use App\Models\Section;
+use App\Models\Subject;
+use App\Models\Unit;
 
 class RecordController extends Controller
 {
@@ -32,14 +35,29 @@ class RecordController extends Controller
                     'is_subscribed' => $record->is_subscribed,
                 ]
             ]);
+        }
+        $section = Section::find($record->section_id);
+        $subject = Subject::find($section->subject_id);
+        $subscription_subject=$subject->subscription;
+        $unit = Unit::find($subject->unit_id);
+        $subscription_unit = $unit->subscription;
+        if ($subscription_unit||$subscription_subject) {
+            $record->update(['is_subscribed' => true]);
+            return response()->json([
+                'record' => [
+                    'path' => $record->path,
+                    'description' => $record->description,
+                    'expired_at' => $record->expired_at,
+                    'is_subscribed' => $record->is_subscribed,
+                ]
+            ]);
         } else {
             return response()->json([
-                "message" => " you dont have any subscribtion",
                 'record' => [
                     'id' => $record->id,
                     'section_id' => $record->section_id,
                     'name' => $record->name,
-                    'is_free'=>$record->is_free,
+                    'is_free' => $record->is_free,
                 ],
             ]);
         }

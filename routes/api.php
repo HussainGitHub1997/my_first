@@ -19,6 +19,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('generate/code',[UserController::class,"generateSubscription"]);
     Route::get('users', [UserController::class, 'index']);
 
+    Route::controller(AESServices::class)->group(function () {
+        Route::post('upload', 'upload');
+        Route::get('encryption/{file_name}', 'encryption');
+        Route::get('decription/{file_name}', 'decription');
+        Route::get('show/{file_name}', 'show');
+    });
+
     Route::group([
         'prefix' => 'record'
     ], function () {
@@ -82,10 +89,5 @@ Route::get('show/unit/{unit}', [UnitController::class, 'show']);
 Route::get('index/unit', [UnitController::class, 'index']);
 
 
-Route::controller(AESServices::class)->group(function () {
-    Route::post('upload', 'upload');
-    Route::get('encryption/{file_name}', 'encryption');
-    Route::get('decription/{file_name}', 'decription');
-    Route::get('show/{file_name}', 'show');
-});
+
 

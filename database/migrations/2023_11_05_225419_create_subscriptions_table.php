@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->morphs('model');
             $table->string('note')->nullable();
-            $table->integer('expire_duration') ;   
+            $table->integer('expire_duration');
+            $table->date('started_at')->nullable();   
             $table->timestamps();
-            $table->date('started_at')->nullable();
         });
     }
 

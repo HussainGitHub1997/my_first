@@ -7,6 +7,7 @@ use App\Models\Unit;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use App\Http\Resources\UnitResource;
+use App\Models\Subscription;
 
 class UnitController extends Controller
 {
@@ -23,7 +24,7 @@ class UnitController extends Controller
 
     public function show(Unit $unit)
     {
-        return response()->json(['unit' => $unit]);
+        return response()->json(['unit' => $unit->units]);
     }
 
     public function store(Request $request)
@@ -51,7 +52,7 @@ class UnitController extends Controller
     public function update(Request $request, Unit $unit)
     {
         $request->validate([
-            'name' => ['string', 'present'],
+            'name'        => ['string', 'present'],
             'description' => ['string', 'nullable'],
         ]);
         $user = $request->user();
