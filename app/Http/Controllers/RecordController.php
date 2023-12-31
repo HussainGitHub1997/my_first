@@ -33,19 +33,21 @@ class RecordController extends Controller
         $subscription_subject = $subject->subscription;
         $unit = Unit::find($subject->unit_id);
         $subscription_unit = $unit->subscription;
+
         $user = User::findOrFail($request->user()->id);
         $subscription_user = Subscription::where('user_id', $user->id)->first();
-        $now_date = date('Y-m-d');
-        $started_date = $subscription_user->started_at;
-        $time = strtotime($now_date) - strtotime($started_date);
-        $days = $time / (24 * 60 * 60) - $subscription_user->expire_duration;
-        if (!$subscription_unit || !$subscription_subject) {
+
+        $time =  strtotime($subscription_user->started_at) - strtotime(date('Y-m-d'));
+        $days = $time / (24 * 60 * 60) + $subscription_user->expire_duration;
+
+        if ($days <= 0) {
             return response()->json([
+                'message' => 'sorry Your subscription has expired',
                 'record' => [
-                    'path' => $record->path,
-                    'description' => $record->description,
-                    'expired_at' => $record->expired_at,
-                    'is_subscribed' => $record->is_subscribed,
+                    'id' => $record->id,
+                    'section_id' => $record->section_id,
+                    'name' => $record->name,
+                    'is_free' => $record->is_free,
                 ],
             ]);
         }
@@ -58,9 +60,9 @@ class RecordController extends Controller
                     'is_subscribed' => $record->is_subscribed,
                 ],
             ]);
-        } elseif ($days <= 0) {
+        }
+        if ($user->id != $subscription_unit->user_id) {
             return response()->json([
-                'message' => 'sorry Your subscription has expired',
                 'record' => [
                     'id' => $record->id,
                     'section_id' => $record->section_id,
@@ -68,15 +70,8 @@ class RecordController extends Controller
                     'is_free' => $record->is_free,
                 ],
             ]);
-        } elseif ($days > 0 && $subscription_unit->user_id == $user->id || $user->id == $subscription_subject->user_id) {
-
-            $subscription = Subscription::where('user_id', $user->id)->first();
-            $rand_start = rand(1, 5);
-            $uniqid = uniqid();
-            $code = substr($uniqid, $rand_start, 8);
-            $subscription->update(['code' => $code]);
+        } else {
             $record->update(['is_subscribed' => true]);
-
             return response()->json([
                 'message' => "you have $days day to your subscription",
                 'record' => [
@@ -86,13 +81,25 @@ class RecordController extends Controller
                     'is_subscribed' => $record->is_subscribed,
                 ],
             ]);
-        } else {
+        }
+        if ($user->id != $subscription_subject->user_id) {
             return response()->json([
                 'record' => [
                     'id' => $record->id,
                     'section_id' => $record->section_id,
                     'name' => $record->name,
                     'is_free' => $record->is_free,
+                ],
+            ]);
+        } else {
+            $record->update(['is_subscribed' => true]);
+            return response()->json([
+                'message' => "you have $days day to your subscription",
+                'record' => [
+                    'path' => $record->path,
+                    'description' => $record->description,
+                    'expired_at' => $record->expired_at,
+                    'is_subscribed' => $record->is_subscribed,
                 ],
             ]);
         }

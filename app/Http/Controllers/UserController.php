@@ -39,16 +39,28 @@ class UserController extends Controller
 
         $subscription = Subscription::where('code', $request->code)->first();
         $client = User::where('id', $subscription->user_id)->first();
-        $subscription->update(['started_at' => now()]);
-        $token = $client->createToken('client_token');
-        return response()->json([
-            'message' => 'Your subscription has been registered successfully',
-            'data' => [
-                'id' => $client->id,
-                'name' => $client->name,
-                'token' => $token->plainTextToken
-            ],
-        ]);
+        if ($subscription->started_at) {
+            $token = $client->createToken('client_token');
+            return response()->json([
+                'message' => 'Your subscription has been registered successfully',
+                'data' => [
+                    'id' => $client->id,
+                    'name' => $client->name,
+                    'token' => $token->plainTextToken
+                ],
+            ]);
+        } else {
+            $subscription->update(['started_at' => now()]);
+            $token = $client->createToken('client_token');
+            return response()->json([
+                'message' => 'Your subscription has been registered successfully',
+                'data' => [
+                    'id' => $client->id,
+                    'name' => $client->name,
+                    'token' => $token->plainTextToken
+                ],
+            ]);
+        }
     }
 
     public function signup(Request $request)
@@ -57,7 +69,7 @@ class UserController extends Controller
             'name' => ['string', 'present'],
             'device_id' => ['present', 'string'],
             'phone_number' => ['required', 'numeric'],
-            'password' => ['string','present','required'],
+            'password' => ['string', 'present', 'required'],
         ]);
 
         $user = User::create([

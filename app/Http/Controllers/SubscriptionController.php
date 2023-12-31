@@ -42,7 +42,7 @@ class SubscriptionController extends Controller
         } else {
             $subscription = Subscription::create([
                 'user_id'         => $request->user_id,
-                'model_type'      => 'App\Models\\'.$request->model_type,
+                'model_type'      => 'App\Models\\' . $request->model_type,
                 'model_id'        => $request->model_id,
                 'code'            => $request->code,
                 'note'            => $request->note,
