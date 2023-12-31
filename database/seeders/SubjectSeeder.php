@@ -15,10 +15,20 @@ class SubjectSeeder extends Seeder
     public function run(): void
     {
         Subject::insert([
-            'name' =>'nonome' ,
+            'name' => 'doctor',
             'unit_id' => 1,
+            'description' => 'unit one day',
+        ]);
+
+        Subject::insert([
+            'name' => 'engineer',
+            'unit_id' => 2,
             'description' => 'no,des',
-            
-            ]);
+        ]);
+        Subject::insert([
+            'name' => 'teacher',
+            'unit_id' => 3,
+            'description' => 'no,des',
+        ]);
     }
 }

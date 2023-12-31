@@ -16,18 +16,25 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::insert([
-        'name' =>'hussain' ,
-        'password' => Hash::make('password'),
-        'phone_number' => '0956978759',
-        'device_id' => 1,
-        'role' => 'admin',
+            'name' => 'hussain',
+            'password' => Hash::make('12345678'),
+            'phone_number' => '0956978759',
+            'device_id' => 1,
+            'role' => 'admin',
         ]);
         User::insert([
-            'name' =>'admad' ,
-            'password' => Hash::make('password'),
-            'phone_number' => '0991965818',
+            'name' => 'admad',
+            'password' => Hash::make('12345678'),
+            'phone_number' => '0933626606',
             'device_id' => 2,
             'role' => 'client',
-            ]);
+        ]);
+        User::insert([
+            'name' => 'adel',
+            'password' => Hash::make('12345678'),
+            'phone_number' => '0996585332',
+            'device_id' => 3,
+            'role' => 'client',
+        ]);
     }
 }

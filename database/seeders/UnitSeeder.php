@@ -14,19 +14,18 @@ class UnitSeeder extends Seeder
     public function run(): void
     {
         Unit::insert([
-            'name' => 'name',
-            'description' => 'no',
-
+            'name' => 'doctor',
+            'description' => 'no description',
         ]);
+
         Unit::insert([
-            'name' => 'ahmad',
+            'name' => 'engineer',
             'description' => 'description',
-
         ]);
-        Unit::insert([
-            'name' => 'adel',
-            'description' => 'nodescription',
 
+        Unit::insert([
+            'name' => 'teacher',
+            'description' => 'nodescription',
         ]);
     }
 }

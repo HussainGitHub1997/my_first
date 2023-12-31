@@ -17,7 +17,7 @@ class UserController extends Controller
     {
         $request->validate([
             'device_id' => ['required', 'string'],
-            'phone_number' => ['required', 'numeric','size:10'],
+            'phone_number' => ['required', 'numeric'],
             'password' => ['required', 'string', 'present'],
         ]);
 

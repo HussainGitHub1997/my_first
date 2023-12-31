@@ -3,9 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Record;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class RecordSeeder extends Seeder
 {
@@ -15,13 +13,27 @@ class RecordSeeder extends Seeder
     public function run(): void
     {
         Record::insert([
-            'name' =>'record1' ,
+            'name' => 'record1',
             'section_id' => 1,
-            'description' => 'dszf',
-            'is_subscribed' => true,
-            'expired_at' => now(),
-            'is_free'=> true,
-            'path'=>'www.hussain.com'
-            ]);
+            'description' => 'description',
+            'is_free' => true,
+            'path' => 'www.hussain.com'
+        ]);
+
+        Record::insert([
+            'name' => 'record2',
+            'section_id' => 2,
+            'description' => 'description 2',
+            'is_free' => false,
+            'path' => 'www.hussain.com'
+        ]);
+
+        Record::insert([
+            'name' => 'record3',
+            'section_id' => 3,
+            'description' => 'description 3',
+            'is_free' => false,
+            'path' => 'www.hussain.com'
+        ]);
     }
 }

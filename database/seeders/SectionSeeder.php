@@ -15,10 +15,19 @@ class SectionSeeder extends Seeder
     public function run(): void
     {
         Section::insert([
-            'subject_id' =>1 ,
-            'description' => 'sdd',
-            'name' => 'nnnn',
-           
-            ]);
+            'subject_id' => 1,
+            'description' => 'description one',
+            'name' => 'one',
+        ]);
+        Section::insert([
+            'subject_id' => 2,
+            'description' => 'description 2',
+            'name' => 'two',
+        ]);
+        Section::insert([
+            'subject_id' => 3,
+            'description' => 'description 3',
+            'name' => 'three',
+        ]);
     }
 }

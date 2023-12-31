@@ -33,6 +33,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('{record}', [RecordController::class, 'update']);
         Route::delete('{record}', [RecordController::class, 'destroy']);
     });
+    Route::get('show/record/{record}', [RecordController::class, 'show']);
+
 
     Route::group([
         'prefix' => 'subscription'
@@ -75,7 +77,6 @@ Route::post('/signup', [UserController::class, 'signup']);
 Route::get('show/section/{section}', [SectionController::class, 'show']);
 Route::get('index/section', [SectionController::class, 'index']);
 
-Route::get('show/record/{record}', [RecordController::class, 'show']);
 Route::get('index/record', [RecordController::class, 'index']);
 
 Route::get('show/subscription/{subscription}', [SubscriptionController::class, 'show']);

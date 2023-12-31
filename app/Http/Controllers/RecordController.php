@@ -9,7 +9,9 @@ use Illuminate\Http\Request;
 use App\Http\Resources\RecordResource;
 use App\Models\Section;
 use App\Models\Subject;
+use App\Models\Subscription;
 use App\Models\Unit;
+use App\Models\User;
 
 class RecordController extends Controller
 {
@@ -24,32 +26,65 @@ class RecordController extends Controller
         ]);
     }
 
-    public function show(Record $record)
+    public function show(Request $request, Record $record)
     {
-        if ($record->is_free || $record->is_subscribed) {
-            return response()->json([
-                'record' => [
-                    'path' => $record->path,
-                    'description' => $record->description,
-                    'expired_at' => $record->expired_at,
-                    'is_subscribed' => $record->is_subscribed,
-                ]
-            ]);
-        }
         $section = Section::find($record->section_id);
         $subject = Subject::find($section->subject_id);
-        $subscription_subject=$subject->subscription;
+        $subscription_subject = $subject->subscription;
         $unit = Unit::find($subject->unit_id);
         $subscription_unit = $unit->subscription;
-        if ($subscription_unit||$subscription_subject) {
-            $record->update(['is_subscribed' => true]);
+        $user = User::findOrFail($request->user()->id);
+        $subscription_user = Subscription::where('user_id', $user->id)->first();
+        $now_date = date('Y-m-d');
+        $started_date = $subscription_user->started_at;
+        $time = strtotime($now_date) - strtotime($started_date);
+        $days = $time / (24 * 60 * 60) - $subscription_user->expire_duration;
+        if (!$subscription_unit || !$subscription_subject) {
             return response()->json([
                 'record' => [
                     'path' => $record->path,
                     'description' => $record->description,
                     'expired_at' => $record->expired_at,
                     'is_subscribed' => $record->is_subscribed,
-                ]
+                ],
+            ]);
+        }
+        if ($record->is_free) {
+            return response()->json([
+                'record' => [
+                    'path' => $record->path,
+                    'description' => $record->description,
+                    'expired_at' => $record->expired_at,
+                    'is_subscribed' => $record->is_subscribed,
+                ],
+            ]);
+        } elseif ($days <= 0) {
+            return response()->json([
+                'message' => 'sorry Your subscription has expired',
+                'record' => [
+                    'id' => $record->id,
+                    'section_id' => $record->section_id,
+                    'name' => $record->name,
+                    'is_free' => $record->is_free,
+                ],
+            ]);
+        } elseif ($days > 0 && $subscription_unit->user_id == $user->id || $user->id == $subscription_subject->user_id) {
+
+            $subscription = Subscription::where('user_id', $user->id)->first();
+            $rand_start = rand(1, 5);
+            $uniqid = uniqid();
+            $code = substr($uniqid, $rand_start, 8);
+            $subscription->update(['code' => $code]);
+            $record->update(['is_subscribed' => true]);
+
+            return response()->json([
+                'message' => "you have $days day to your subscription",
+                'record' => [
+                    'path' => $record->path,
+                    'description' => $record->description,
+                    'expired_at' => $record->expired_at,
+                    'is_subscribed' => $record->is_subscribed,
+                ],
             ]);
         } else {
             return response()->json([
