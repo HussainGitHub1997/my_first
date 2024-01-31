@@ -25,25 +25,41 @@ class AESServices
         }
     }
 
-    public function combine_files(Request $request, $file_name)
+    public function combineFiles(Request $request, $file_name, $name_chunk_1, $name_chunk_2, $name_chunk_3)
     {
+        // $contents="";
+        // for($i=1;$i<=$number_chunk;$i++){
+        // $contents .= Storage::get("public/uploads/{$file_name}_{$i}");
+        // }
+        // Storage::disk('local')->put("public/merge_files/$file_name", $contents);
+        // dd($contents);
+
         $user = $request->user();
         if ($user->role == 'admin') {
-            $files = Storage::files("public/uploads");
-            $files = Arr::sort($files);
-            $firstChunk = Arr::first($files);
-            $remainderChunks = Arr::except($files, 0);
-            $array_size = count($remainderChunks);
-            $wholeFile = "public/merge_files/$file_name";
-            Storage::disk('local')->put($wholeFile, Storage::disk('local')->get($firstChunk));
-            foreach ($remainderChunks as $chunk) {
-                Storage::disk('local')->append($wholeFile, Storage::disk('local')->get($chunk));
-            }
+            $chunk_1 = (Storage::get("public/uploads/$name_chunk_1"));
+            $chunk_2 = (Storage::get("public/uploads/$name_chunk_2"));
+            $chunk_3 = (Storage::get("public/uploads/$name_chunk_3"));
+            $combine = $chunk_1 . $chunk_2 . $chunk_3;
+            Storage::disk('local')->put("public/merge_files/$file_name", $combine);
             // Storage::deleteDirectory("public/uploads");
             return "the file merge sucssesfully";
         } else {
             return new AuthenticationException();
         }
+        //     $files = Storage::files("public/uploads");
+        //     $files = Arr::sort($files);
+        //     // dd($files);
+        //     $firstChunk = Arr::first($files);
+
+        // $remainderChunks = Arr::except($files, 0);
+        //     $array_size = count($remainderChunks);
+        //     $wholeFile = "public/merge_files/$file_name";
+        //     Storage::disk('local')->put($wholeFile, Storage::disk('local')->get($firstChunk));
+        //     foreach ($remainderChunks as $chunk) {
+        //         Storage::disk('local')->append($wholeFile, Storage::disk('local')->get($chunk));
+        // }
+        // Storage::deleteDirectory("public/uploads");
+
     }
 
 

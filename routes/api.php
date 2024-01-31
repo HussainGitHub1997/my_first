@@ -24,7 +24,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('encryption/{file_name}', 'encryption');
         Route::get('decription/{file_name}', 'decription');
         Route::get('show/{file_name}', 'show');
-        Route::get('combine/{file_name}', 'combine_files');
+        Route::get('combine/{file_name}/{number_chunk}/{namechunk_2}/{namechunk_3}', 'combineFiles');
     });
 
     Route::group([
